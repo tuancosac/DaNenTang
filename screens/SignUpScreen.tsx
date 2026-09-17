@@ -8,8 +8,8 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { styles } from './styles/form';
-import UniverseBackground from './components/background';
+import { styles } from '../styles/form';
+import UniverseBackground from '../components/background';
 
 const SignUpScreen = () => {
   return (
