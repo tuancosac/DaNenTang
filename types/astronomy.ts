@@ -1,4 +1,4 @@
-export type EventType = | "moon" | "esclipe" | "meteor" | "iss" | "asteroid";
+export type EventType = | "moon" | "eclipse" | "meteor" | "iss" | "asteroid";
 
 export interface  AstronomyEvent {
     id: string;
@@ -8,3 +8,4 @@ export interface  AstronomyEvent {
     description: string;
     icon: string;
 }
+

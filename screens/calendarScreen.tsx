@@ -20,8 +20,6 @@ export default function App() {
 
     useEffect(() => {
 
-        // Astronomy.
-
         loadData();
 
         const moonEvents = getMoonEvents();
@@ -31,8 +29,19 @@ export default function App() {
 
         const eclipseEvents = getEclipseEvents();
         setEvents(eclipseEvents);
-        console.log("Eclipse Events" , eclipseEvents)
-        // expandAction();
+        // console.log("Eclipse Events" , eclipseEvents)
+        
+        const allEvents = [
+            ...moonEvents,
+            ...eclipseEvents,
+        ];
+        setEvents(allEvents);
+
+        const sortedEvents = [...allEvents].sort(
+            (a, b) => a.date.getTime() - b.date.getTime()
+        );
+
+        console.log('All events', allEvents);
 
     },[]);
 
@@ -42,9 +51,11 @@ export default function App() {
     const fullMoon = events[2];
     const lastQuarter = events[3];
 
-    const sortedEvents = [...events].sort(
-        (a, b) => a.date.getTime() - b.date.getTime()
-    );
+    // const lunar = events[4];
+    // console.log("Events", allEvents);
+
+    
+    
     // console.log( "SortedEvents",sortedEvents)
 
     console.log(Astronomy);
@@ -121,25 +132,28 @@ export default function App() {
         const now = new Date();
 
         const lunar = Astronomy.SearchLunarEclipse(now);
-        // console.log("Nhat thuc",nhatthuc)
+        // console.log("Nhat thuc",lunar)
         const solar = Astronomy.SearchGlobalSolarEclipse(now);
+        console.log("Lunar eclipse:", lunar);
+        console.log("Solar eclipse:", solar);
+
 
         return [
             {
                 id: "lunar-eclipse",
                 title: "Nguyệt thực",
-                type: "esclipe",
+                type: "eclipse",
                 date: lunar.peak ? lunar.peak.date : new Date(),
                 description: `Nguyệt thực (Pha/Loại: ${lunar.kind}, Độ che khuất: ${lunar.obscuration})`,
-                icon: "🌑",
+                icon: "🌕",
             },
             {
                 id: "solar-eclipse",
                 title: "Nhật thực",
-                type: "esclipe",
+                type: "eclipse",
                 date: solar.peak ? solar.peak.date : new Date(),
                 description: `Nhật thực (Loại: ${solar.kind}${solar.latitude !== undefined ? `, Tọa độ: ${solar.latitude}°,${solar.longitude}°` : ''})`,
-                icon: "🌑",
+                icon: "☀️",
             }
 
         ];
@@ -184,7 +198,7 @@ export default function App() {
             <Text style={styles.eventTitle}>Xem các sự kiện sắp tới</Text>
 
             <Pressable onPress={expandAction} style={styles.eventTitle}>
-                <Text style={styles.cardTitle}>Mặt Trăng</Text> 
+                <Text style={styles.cardTitle}>Moon Events </Text> 
             </Pressable>    
             
    
@@ -216,6 +230,29 @@ export default function App() {
                 </View>
                 )
             }
+
+            <Pressable onPress={expandAction} style={styles.eventTitle}>
+                <Text style={styles.cardTitle}>Eclipse Events</Text> 
+            </Pressable>        
+
+            {/* {expanded &&(
+                <View>
+                    <View style = {styles.card} >
+                        <Text style={styles.cardTitle}>{newMoon?.icon} {newMoon?.title}</Text>
+                        <Text style={styles.cardItems}>{ newMoon ? newMoon.date.toLocaleString() : "Đang tải..."}</Text>
+                        <Text style={styles.cardItems}>{newMoon?.description}</Text>
+                    </View>
+
+                    <View style = {styles.card}>
+                        <Text style={styles.cardTitle}>{firstQuarter?.icon} {firstQuarter?.title}</Text>
+                        <Text style={styles.cardItems}>{ firstQuarter ? firstQuarter.date.toLocaleString() : "Đang tải..."}</Text>
+                        <Text style={styles.cardItems}>{firstQuarter?.description}</Text>
+                    </View>
+                </View>
+                )
+
+            } */}
+
         </ScrollView>
     </UniverseBackground>  
     );
