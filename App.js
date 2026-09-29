@@ -10,9 +10,9 @@ export default function App() {
     <>
       <StatusBar barStyle="light-content" backgroundColor="#050510" />
       {/* <SignUpScreen /> */}
-      {/* <CalendarScreen /> */}
+      <CalendarScreen />
       {/* {<HomeScreen />} */}
-      <LogInScreen />
+      {/* <LogInScreen /> */}
     </>
   );
 }
