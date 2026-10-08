@@ -3,97 +3,112 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Account, AccountDocument } from './account.schema';
 import { AccountDto } from 'src/dto/account.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AccountService {
-  // Mảng lưu danh sách tài khoản trong bộ nhớ tạm
-  private accounts: any[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectModel(Account.name) private accountModel: Model<AccountDocument>,
+    private readonly jwtService: JwtService,
+  ) {}
 
-  constructor(private readonly jwtService: JwtService) {}
-
+  // 1. Tạo tài khoản chung trực tiếp vào MongoDB
   async createAccount(accountDto: AccountDto): Promise<any> {
+    const { username, email, password } = accountDto;
+
+    const existingAccount = await this.accountModel.findOne({
+      or: [{ email }, { username }],
+    });
+    if (existingAccount) {
+      throw new ConflictException('Email hoặc Tên người dùng đã tồn tại');
+    }
+
     const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(accountDto.password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newAccount = {
-      id: this.idCounter++,
-      ...accountDto,
+    const newAccount = await this.accountModel.create({
+      username,
+      email,
       password: hashedPassword,
-      createdAt: new Date(),
-    };
+    });
 
-    this.accounts.push(newAccount);
     return newAccount;
   }
 
-  async detailAccount(id: number): Promise<any | null> {
-    const account = this.accounts.find((acc) => acc.id === Number(id));
-    return account || null;
-  }
-
-  async updateAccount(id: number, accountDto: AccountDto): Promise<any | null> {
-    const index = this.accounts.findIndex((acc) => acc.id === Number(id));
-    if (index === -1) {
+  // 2. Xem chi tiết tài khoản bằng ID
+  async detailAccount(id: string): Promise<any | null> {
+    const account = await this.accountModel.findById(id);
+    if (!account) {
       throw new NotFoundException(`Không tìm thấy tài khoản với ID: ${id}`);
     }
+    return account;
+  }
 
-    const updateData = { ...accountDto };
+  // 3. Cập nhật tài khoản trên Cloud
+  async updateAccount(id: string, accountDto: AccountDto): Promise<any | null> {
+    const updateData: any = { ...accountDto };
+    
     if (updateData.password) {
       const salt = await bcrypt.genSalt();
       updateData.password = await bcrypt.hash(updateData.password, salt);
     }
 
-    this.accounts[index] = {
-      ...this.accounts[index],
-      ...updateData,
-    };
+    const updatedAccount = await this.accountModel.findByIdAndUpdate(
+      id,
+      { set: updateData },
+      { new: true },
+    );
 
-    return this.accounts[index];
+    if (!updatedAccount) {
+      throw new NotFoundException(`Không tìm thấy tài khoản với ID: ${id}`);
+    }
+
+    return updatedAccount;
   }
 
-  async deleteAccount(id: number): Promise<boolean> {
-    const initialLength = this.accounts.length;
-    this.accounts = this.accounts.filter((acc) => acc.id !== Number(id));
-    return this.accounts.length < initialLength;
+  // 4. Xóa tài khoản khỏi MongoDB Atlas
+  async deleteAccount(id: string): Promise<boolean> {
+    const result = await this.accountModel.deleteOne({ _id: id });
+    return result.deletedCount > 0;
   }
 
+  // 5. Hàm ĐĂNG KÝ chính thức lưu vào Database Cloud Explor_Astronomy
   async register(registerDto: AccountDto) {
     const { username, email, password } = registerDto;
 
-    // 1. Kiểm tra Email hoặc Username đã tồn tại chưa
-    const existingAccount = this.accounts.find(
-      (acc) => acc.email === email || acc.username === username,
-    );
+    // Kiểm tra trùng lặp trên MongoDB Cloud thực tế
+    const existingAccount = await this.accountModel.findOne({
+      or: [{ email }, { username }],
+    });
 
     if (existingAccount) {
       throw new ConflictException('Email hoặc Tên người dùng đã được sử dụng');
     }
 
-    // 2. Hash mật khẩu bằng bcrypt
+    // Bảo mật mật khẩu bằng bcrypt
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-    // 3. Tạo tài khoản mới
-    const newAccount = {
-      id: this.idCounter++,
+    // Lưu dữ liệu thực tế lên MongoDB Atlas
+    const newAccount = await this.accountModel.create({
       username,
       email,
       password: hashedPassword,
-      createdAt: new Date(),
-    };
-
-    this.accounts.push(newAccount);
-
-    // 4. Loại bỏ trường password trước khi trả về response
-    const { password: _, ...result } = newAccount;
+    });
 
     return {
-      message: 'Đăng ký tài khoản thành công (In-Memory Test)',
-      data: result,
+      message: 'Đăng ký tài khoản thành công vào MongoDB Atlas Cloud!',
+      data: {
+        id: newAccount._id,
+        username: newAccount.username,
+        email: newAccount.email,
+        createdAt: (newAccount as any).createdAt,
+      },
     };
   }
 }
