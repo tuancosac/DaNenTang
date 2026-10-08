@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "astronomy-engine": "^2.1.19",
+    "axios": "^1.20.0",
     "expo": "~57.0.9",
     "expo-av": "^16.0.8",
     "expo-status-bar": "~57.0.1",
