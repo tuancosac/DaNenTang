@@ -40,9 +40,18 @@ export class AccountService {
     return newAccount;
   }
 
-  // 2. Xem chi tiết tài khoản bằng ID
+  // 2. Xem tất cả tài khoản
+  async findAll(): Promise<any[]> {
+    return this.accountModel
+      .find()
+      .select('-password')
+      .lean()
+      .exec();
+  }
+
+  // 3. Xem chi tiết tài khoản bằng ID
   async detailAccount(id: string): Promise<any | null> {
-    const account = await this.accountModel.findById(id);
+    const account = await this.accountModel.findById(id).select('-password');
     if (!account) {
       throw new NotFoundException(`Không tìm thấy tài khoản với ID: ${id}`);
     }
