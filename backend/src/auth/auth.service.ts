@@ -1,20 +1,38 @@
-// src/auth/auth.service.ts
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
+import { AccountService } from '../accounts/accounts.service';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
-  login(loginDto: LoginDto) {
-    const { email, password } = loginDto;
+  constructor(
+    private readonly accountService: AccountService,
+    private readonly jwtService: JwtService,
+  ) {}
 
-    // Ví dụ kiểm tra dữ liệu giả lập (Sau này bạn sẽ check với Database)
-    if (email === 'admin@gmail.com' && password === '123456') {
-      return {
-        message: 'Đăng nhập thành công',
-        accessToken: 'fake-jwt-token-example',
-      };
+  async login(loginDto: LoginDto) {
+    const { email, password } = loginDto;
+    const account = await this.accountService.findByEmail(email);
+
+    if (!account || !(await bcrypt.compare(password, account.password))) {
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
     }
 
-    throw new UnauthorizedException('Email hoặc mật khẩu không đúng');
+    const id = account._id.toString();
+    const accessToken = await this.jwtService.signAsync({
+      id,
+      email: account.email,
+    });
+
+    return {
+      message: 'Đăng nhập thành công',
+      accessToken,
+      user: {
+        id,
+        username: account.username,
+        email: account.email,
+      },
+    };
   }
 }

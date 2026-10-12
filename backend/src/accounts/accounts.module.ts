@@ -4,18 +4,23 @@ import { AccountService } from './accounts.service';
 import { AccountController } from './accounts.controller';
 import { Account, AccountSchema } from './account.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     // Đăng ký bảng Account với MongooseModule
     MongooseModule.forFeature([{ name: Account.name, schema: AccountSchema }]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'SECRET_KEY',
-      signOptions: { expiresIn: '1d' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET') || 'SECRET_KEY',
+        signOptions: { expiresIn: '1d' },
+      }),
     }),
   ],
   controllers: [AccountController],
   providers: [AccountService],
-  exports: [AccountService],
+  exports: [AccountService, JwtModule],
 })
 export class AccountModule {}
