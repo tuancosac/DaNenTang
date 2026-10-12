@@ -9,6 +9,8 @@ import { Account, AccountDocument } from './account.schema';
 import { AccountDto } from 'src/dto/account.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { LoginDto } from 'src/auth/dto/login.dto';
+import { UnauthorizedException } from '@nestjs/common';
 
 @Injectable()
 export class AccountService {
@@ -123,6 +125,51 @@ export class AccountService {
         username: newAccount.username,
         email: newAccount.email,
         createdAt: (newAccount as any).createdAt,
+      },
+    };
+  }
+
+  // 6. Hàm ĐĂNG NHẬP
+  async login(loginDto: { email: string; password: string }) {
+    const email = loginDto.email.trim().toLowerCase();
+
+    const account = await this.accountModel
+      .findOne({ email })
+      .exec();
+
+    if (!account) {
+      throw new UnauthorizedException(
+        'Email hoặc mật khẩu không đúng',
+      );
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      account.password,
+    );
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException(
+        'Email hoặc mật khẩu không đúng',
+      );
+    }
+
+    const payload = {
+      sub: account._id.toString(),
+      email: account.email,
+      username: account.username,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return {
+      message: 'Đăng nhập thành công!',
+      accessToken,
+      tokenType: 'Bearer',
+      user: {
+        id: account._id.toString(),
+        username: account.username,
+        email: account.email,
       },
     };
   }
