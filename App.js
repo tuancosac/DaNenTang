@@ -9,10 +9,9 @@ export default function App() {
   return (
     <>
       <StatusBar barStyle="light-content" backgroundColor="#050510" />
-      {/* <SignUpScreen /> */}
-      <CalendarScreen />
-      {/* {<HomeScreen />} */}
-      {/* <LogInScreen /> */}
+      <SignUpScreen />
+      {/* <CalendarScreen /> */}
+      {/* <HomeScreen /> */}
     </>
   );
 }

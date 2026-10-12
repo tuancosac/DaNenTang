@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#111318" />
+    <title>Người dùng | DaNenTang Admin</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --background: #111318;
+        --sidebar: #15171d;
+        --surface: #1a1d25;
+        --surface-raised: #20242e;
+        --border: #292d37;
+        --text: #f3f4f6;
+        --muted: #9298a5;
+        --blue: #6387ff;
+        --cyan: #45d5d0;
+        --green: #43d49b;
+        --orange: #ffbd58;
+        --red: #ff727f;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 86% 5%, rgba(86, 112, 208, .1), transparent 30%),
+          var(--background);
+        color: var(--text);
+        font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button, input { font: inherit; }
+      button { color: inherit; }
+
+      .app-shell {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 246px minmax(0, 1fr);
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        background: rgba(21, 23, 29, .96);
+        border-right: 1px solid var(--border);
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 4px 8px 30px;
+        font-size: 16px;
+        font-weight: 650;
+        letter-spacing: -.02em;
+      }
+
+      .brand-mark {
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #5685ff, #7358ec);
+        box-shadow: 0 5px 18px #5976f44a;
+        color: white;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .nav-label {
+        padding: 0 11px;
+        margin: 9px 0 8px;
+        color: #777e8c;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 42px;
+        padding: 0 12px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        color: #aeb3bf;
+        text-decoration: none;
+      }
+
+      .nav-link.active {
+        color: #fff;
+        background: linear-gradient(100deg, #5579f1, #647ff4);
+        box-shadow: 0 5px 16px #4a6ceb30;
+      }
+
+      .nav-icon {
+        width: 18px;
+        text-align: center;
+        font-size: 16px;
+      }
+
+      .sidebar-bottom {
+        margin-top: auto;
+        padding: 16px 10px 0;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .main { min-width: 0; }
+
+      .topbar {
+        height: 68px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 34px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(17, 19, 24, .72);
+      }
+
+      .breadcrumbs { color: var(--muted); font-size: 13px; }
+      .breadcrumbs strong { color: var(--text); font-weight: 550; }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+        color: #aeb3bf;
+      }
+
+      .icon-button {
+        width: 34px;
+        height: 34px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      .icon-button:hover { background: var(--surface-raised); }
+
+      .profile-dot {
+        width: 31px;
+        height: 31px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #ffffff22;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #3f6473, #7768a2);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .content {
+        width: min(1320px, 100%);
+        margin: 0 auto;
+        padding: 29px 34px 46px;
+      }
+
+      .page-heading {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(24px, 3vw, 30px);
+        letter-spacing: -.045em;
+        line-height: 1.2;
+      }
+
+      .subtitle { margin: 7px 0 0; color: var(--muted); }
+
+      .date-note {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        color: #c2c6d0;
+        background: #171920;
+        font-size: 12px;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .stat-card, .panel {
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        background: linear-gradient(145deg, #1b1e26, #181a21);
+        box-shadow: 0 10px 28px #00000012;
+      }
+
+      .stat-card { min-height: 124px; padding: 18px 19px; }
+
+      .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: #b3b8c3;
+        font-size: 12px;
+      }
+
+      .stat-icon {
+        width: 30px;
+        height: 30px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: #6387ff1c;
+        color: var(--blue);
+        font-size: 15px;
+      }
+
+      .stat-card:nth-child(2) .stat-icon { background: #45d5d01a; color: var(--cyan); }
+      .stat-card:nth-child(3) .stat-icon { background: #ffbd581a; color: var(--orange); }
+
+      .stat-value {
+        margin-top: 10px;
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -.04em;
+      }
+
+      .stat-caption { margin-top: 1px; color: #818795; font-size: 11px; }
+
+      .panel { overflow: hidden; }
+
+      .panel-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel-title { margin: 0; font-size: 15px; font-weight: 650; }
+      .panel-caption { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+
+      .table-tools {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-wrap { position: relative; }
+
+      .search-icon {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        color: #848b98;
+        transform: translateY(-50%);
+        pointer-events: none;
+      }
+
+      .search-input {
+        width: min(260px, 30vw);
+        height: 36px;
+        padding: 0 12px 0 33px;
+        border: 1px solid #333743;
+        border-radius: 8px;
+        outline: none;
+        background: #14161c;
+        color: var(--text);
+        font-size: 12px;
+      }
+
+      .search-input:focus { border-color: #6387ff99; }
+      .search-input::placeholder { color: #747b88; }
+
+      .refresh-button {
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 12px;
+        border: 1px solid #333743;
+        border-radius: 8px;
+        background: #20232b;
+        color: #d5d8df;
+        cursor: pointer;
+        font-size: 12px;
+      }
+
+      .refresh-button:hover { border-color: #545a69; }
+      .refresh-button:disabled { opacity: .6; cursor: wait; }
+
+      .table-scroll { overflow-x: auto; }
+
+      table { width: 100%; border-collapse: collapse; text-align: left; }
+
+      th {
+        padding: 12px 20px;
+        background: #191b22;
+        color: #818795;
+        font-size: 10px;
+        font-weight: 650;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      td {
+        padding: 14px 20px;
+        border-top: 1px solid #282b34;
+        color: #c9cdd6;
+        font-size: 12px;
+        white-space: nowrap;
+      }
+
+      tbody tr:hover { background: #ffffff05; }
+
+      .user-cell {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        flex: 0 0 34px;
+        display: grid;
+        place-items: center;
+        border: 1px solid #ffffff12;
+        border-radius: 10px;
+        background: linear-gradient(145deg, #30435f, #555180);
+        color: #e8edff;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .user-name { color: #f0f1f4; font-weight: 600; }
+      .user-id { margin-top: 2px; color: #7f8693; font-size: 10px; }
+      .email { color: #aeb4c0; }
+
+      .role-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border: 1px solid #6387ff35;
+        border-radius: 6px;
+        background: #6387ff12;
+        color: #9ab0ff;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .status-cell { color: #aeb4c0; }
+      .status-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 7px;
+        border-radius: 50%;
+        background: var(--green);
+        box-shadow: 0 0 9px #43d49b55;
+      }
+
+      .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 13px 20px;
+        border-top: 1px solid var(--border);
+        color: #858b98;
+        font-size: 11px;
+      }
+
+      .message {
+        padding: 36px 20px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .message.error { color: #ff9aa3; }
+      [hidden] { display: none !important; }
+
+      @media (max-width: 900px) {
+        .app-shell { grid-template-columns: 205px minmax(0, 1fr); }
+        .content { padding: 25px 22px 36px; }
+        .topbar { padding: 0 22px; }
+        .stats { gap: 11px; }
+        .stat-card { padding: 15px; }
+        th, td { padding-right: 14px; padding-left: 14px; }
+      }
+
+      @media (max-width: 680px) {
+        .app-shell { display: block; }
+        .sidebar {
+          position: static;
+          width: 100%;
+          height: auto;
+          padding: 10px 14px;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          border-right: 0;
+          border-bottom: 1px solid var(--border);
+        }
+        .brand { padding: 0 4px; }
+        .nav-label, .sidebar-bottom { display: none; }
+        .nav-link { min-height: 38px; padding: 0 11px; }
+        .topbar { height: 54px; padding: 0 16px; }
+        .content { padding: 22px 15px 30px; }
+        .page-heading { align-items: flex-start; }
+        .date-note { display: none; }
+        .stats { grid-template-columns: 1fr; gap: 10px; }
+        .stat-card { min-height: 98px; }
+        .stat-value { margin-top: 5px; font-size: 24px; }
+        .panel-heading { align-items: flex-start; flex-direction: column; }
+        .table-tools { width: 100%; }
+        .search-wrap { flex: 1; }
+        .search-input { width: 100%; }
+        .refresh-button { flex-shrink: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">D</span><span>DaNenTang <span style="color:#858b98;font-weight:450">admin</span></span></div>
+        <div class="nav-label">Quản lý</div>
+        <a class="nav-link active" href="#users" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">♙</span>
+          <span>Người dùng</span>
+        </a>
+        <div class="sidebar-bottom">Khu vực quản trị</div>
+      </aside>
+
+      <div class="main">
+        <header class="topbar">
+          <div class="breadcrumbs">Quản lý <span aria-hidden="true">/</span> <strong>Người dùng</strong></div>
+          <div class="topbar-right">
+            <span id="lastUpdated" style="font-size:11px"></span>
+            <span class="profile-dot" aria-label="Quản trị viên">AD</span>
+          </div>
+        </header>
+
+        <main class="content" id="users">
+          <div class="page-heading">
+            <div>
+              <h1>Người dùng</h1>
+              <p class="subtitle">Tổng quan và danh sách tài khoản người dùng.</p>
+            </div>
+            <div class="date-note"><span aria-hidden="true">◷</span><span id="todayLabel"></span></div>
+          </div>
+
+          <section class="stats" aria-label="Tổng quan người dùng">
+            <article class="stat-card">
+              <div class="stat-top"><span>Tổng người dùng</span><span class="stat-icon" aria-hidden="true">♙</span></div>
+              <div class="stat-value" id="totalUsers">—</div>
+              <div class="stat-caption">Tài khoản đã đăng ký</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span>Đăng ký trong 7 ngày</span><span class="stat-icon" aria-hidden="true">↗</span></div>
+              <div class="stat-value" id="weeklyUsers">—</div>
+              <div class="stat-caption">Tài khoản mới trong tuần qua</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span>Đăng ký tháng này</span><span class="stat-icon" aria-hidden="true">▦</span></div>
+              <div class="stat-value" id="monthlyUsers">—</div>
+              <div class="stat-caption">Tài khoản mới từ đầu tháng</div>
+            </article>
+          </section>
+
+          <section class="panel" aria-labelledby="users-title">
+            <div class="panel-heading">
+              <div>
+                <h2 class="panel-title" id="users-title">Tất cả người dùng</h2>
+                <p class="panel-caption">Danh sách tài khoản được lưu trong hệ thống</p>
+              </div>
+              <div class="table-tools">
+                <label class="search-wrap">
+                  <span class="search-icon" aria-hidden="true">⌕</span>
+                  <input id="searchInput" class="search-input" type="search" placeholder="Tìm tên hoặc email..." aria-label="Tìm người dùng" />
+                </label>
+                <button id="refreshBtn" class="refresh-button" type="button"><span aria-hidden="true">⟳</span> Làm mới</button>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Người dùng</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Ngày tham gia</th>
+                  </tr>
+                </thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
+            <div id="message" class="message" role="status">Đang tải người dùng...</div>
+            <footer class="table-footer">
+              <span id="resultsLabel">Đang tải danh sách...</span>
+              <span id="connectionLabel">Đang kết nối</span>
+            </footer>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const API_URL = 'http://localhost:3667/accounts';
+      const state = { users: [], search: '' };
+      const tableBody = document.getElementById('userTableBody');
+      const message = document.getElementById('message');
+      const searchInput = document.getElementById('searchInput');
+      const refreshButton = document.getElementById('refreshBtn');
+      const formatter = new Intl.NumberFormat('vi-VN');
+      const dateFormatter = new Intl.DateTimeFormat('vi-VN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+
+      document.getElementById('todayLabel').textContent =
+        new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' }).format(new Date());
+
+      function safeDate(value) {
+        if (!value) return null;
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? null : date;
+      }
+
+      function getInitials(name) {
+        const words = String(name || 'U').trim().split(/\s+/).filter(Boolean);
+        return words.slice(0, 2).map(word => word[0].toLocaleUpperCase('vi-VN')).join('');
+      }
+
+      function appendCell(row, text, className) {
+        const cell = document.createElement('td');
+        cell.textContent = text;
+        if (className) cell.className = className;
+        row.appendChild(cell);
+        return cell;
+      }
+
+      function getUsers() {
+        return state.users.filter(user => {
+          const searchText = [user.username, user.email].filter(Boolean).join(' ').toLocaleLowerCase('vi-VN');
+          return searchText.includes(state.search.toLocaleLowerCase('vi-VN'));
+        });
+      }
+
+      function renderStats() {
+        const now = new Date();
+        const weekAgo = new Date(now);
+        weekAgo.setDate(now.getDate() - 7);
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const validDates = state.users.map(user => safeDate(user.createdAt));
+
+        document.getElementById('totalUsers').textContent = formatter.format(state.users.length);
+        document.getElementById('weeklyUsers').textContent = formatter.format(
+          validDates.filter(date => date && date >= weekAgo && date <= now).length
+        );
+        document.getElementById('monthlyUsers').textContent = formatter.format(
+          validDates.filter(date => date && date >= startOfMonth && date <= now).length
+        );
+      }
+
+      function renderUsers() {
+        tableBody.replaceChildren();
+        const users = getUsers();
+        document.getElementById('resultsLabel').textContent =
+          `Hiển thị ${formatter.format(users.length)} / ${formatter.format(state.users.length)} người dùng`;
+
+        if (!users.length) {
+          message.hidden = false;
+          message.className = 'message';
+          message.textContent = state.users.length ? 'Không tìm thấy người dùng phù hợp.' : 'Chưa có người dùng nào.';
+          return;
+        }
+
+        message.hidden = true;
+        for (const user of users) {
+          const row = document.createElement('tr');
+          const userCell = document.createElement('td');
+          const userInfo = document.createElement('div');
+          const avatar = document.createElement('span');
+          const details = document.createElement('div');
+          const name = document.createElement('div');
+          const id = document.createElement('div');
+
+          userInfo.className = 'user-cell';
+          avatar.className = 'avatar';
+          avatar.textContent = getInitials(user.username);
+          details.className = 'user-details';
+          name.className = 'user-name';
+          name.textContent = user.username || 'Chưa cập nhật';
+          id.className = 'user-id';
+          id.textContent = user._id ? `ID: ${user._id}` : '';
+          details.append(name, id);
+          userInfo.append(avatar, details);
+          userCell.appendChild(userInfo);
+          row.appendChild(userCell);
+
+          const emailCell = appendCell(row, user.email || '—', 'email');
+          emailCell.style.userSelect = 'text';
+
+          const createdAt = safeDate(user.createdAt);
+          appendCell(row, createdAt ? dateFormatter.format(createdAt) : '—');
+          tableBody.appendChild(row);
+        }
+      }
+
+      async function fetchUsers() {
+        refreshButton.disabled = true;
+        message.hidden = false;
+        message.className = 'message';
+        message.textContent = 'Đang tải người dùng...';
+        document.getElementById('connectionLabel').textContent = 'Đang kết nối';
+
+        try {
+          const response = await fetch(API_URL, { headers: { Accept: 'application/json' } });
+          if (!response.ok) throw new Error(`Backend trả về lỗi ${response.status}`);
+          const data = await response.json();
+          if (!Array.isArray(data)) throw new Error('Dữ liệu người dùng không đúng định dạng');
+
+          state.users = data;
+          renderStats();
+          renderUsers();
+          document.getElementById('connectionLabel').textContent = '● Đã kết nối';
+          document.getElementById('connectionLabel').style.color = 'var(--green)';
+          document.getElementById('lastUpdated').textContent =
+            `Cập nhật ${new Intl.DateTimeFormat('vi-VN', { hour: '2-digit', minute: '2-digit' }).format(new Date())}`;
+        } catch (error) {
+          console.error('Không thể tải danh sách người dùng:', error);
+          tableBody.replaceChildren();
+          message.hidden = false;
+          message.className = 'message error';
+          message.textContent = 'Không thể tải người dùng. Hãy kiểm tra backend và thử làm mới.';
+          document.getElementById('resultsLabel').textContent = 'Không tải được danh sách';
+          document.getElementById('connectionLabel').textContent = '● Mất kết nối';
+          document.getElementById('connectionLabel').style.color = 'var(--red)';
+          document.getElementById('totalUsers').textContent = '—';
+          document.getElementById('weeklyUsers').textContent = '—';
+          document.getElementById('monthlyUsers').textContent = '—';
+        } finally {
+          refreshButton.disabled = false;
+        }
+      }
+
+      searchInput.addEventListener('input', () => {
+        state.search = searchInput.value.trim();
+        renderUsers();
+      });
+      refreshButton.addEventListener('click', fetchUsers);
+      fetchUsers();
+    </script>
+  </body>
+</html>
