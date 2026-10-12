@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AstronomyModule } from './astronomy/astronomy.module';
 import { AccountModule } from './accounts/accounts.module';
+import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestDbModule } from './Test/test-db.module';
@@ -11,6 +12,7 @@ import { TestDbModule } from './Test/test-db.module';
   imports: [
     AstronomyModule,
     AccountModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,74 +9,78 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import axios, { AxiosError } from 'axios';
-import { styles } from '../styles/form';
-import UniverseBackground from '../components/background';
+} from "react-native";
+import { AxiosError } from "axios";
+import { styles } from "../styles/form";
+import UniverseBackground from "../components/background";
+import { apiClient } from "../services/api";
 
 interface SignUpScreenProps {
   navigation?: any;
 }
-const API_URL = 'http://192.168.1.51:3667/accounts/register';
-
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    console.log('>>> CLICK BUTTON REGISTER SUCCESS!');
+    console.log(">>> CLICK BUTTON REGISTER SUCCESS!");
     // 1. Kiểm tra rỗng
     if (!username.trim() || !email.trim() || !password || !confirmPassword) {
-      if (Platform.OS === 'web') window.alert('Vui lòng điền đủ thông tin');
-      else Alert.alert('Thông báo', 'Vui lòng điền đầy đủ thông tin');
+      if (Platform.OS === "web") window.alert("Vui lòng điền đủ thông tin");
+      else Alert.alert("Thông báo", "Vui lòng điền đầy đủ thông tin");
       return;
     }
 
     // 2. Kiểm tra mật khẩu khớp nhau
     if (password !== confirmPassword) {
-      Alert.alert('Lỗi', 'Mật khẩu xác nhận không khớp');
+      Alert.alert("Lỗi", "Mật khẩu xác nhận không khớp");
       return;
     }
 
     // 3. Kiểm tra độ dài mật khẩu
     if (password.length < 6) {
-      Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+      Alert.alert("Lỗi", "Mật khẩu phải có ít nhất 6 ký tự");
       return;
     }
 
     setLoading(true);
 
     try {
-      await axios.post(API_URL, {
+      await apiClient.post("/accounts/register", {
         username: username.trim(),
         email: email.trim(),
         password: password,
       });
 
-      Alert.alert('Thành công', 'Đăng ký tài khoản thành công!', [
-        {
-          text: 'Đăng nhập ngay',
-          onPress: () => navigation?.navigate?.('Login'),
-        },
-      ]);
+      if (Platform.OS === "web") {
+        window.alert("Đăng ký tài khoản thành công!");
+        navigation?.navigate?.("Login");
+      } else {
+        Alert.alert("Thành công", "Đăng ký tài khoản thành công!", [
+          {
+            text: "Đăng nhập ngay",
+            onPress: () => navigation?.navigate?.("Login"),
+          },
+        ]);
+      }
 
       // Reset ô nhập liệu
-      setUsername('');
-      setEmail('');
-      setPassword('');
-      setConfirmPassword('');
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (error: any) {
       const err = error as AxiosError<{ message: string | string[] }>;
       const errorMessage =
         err.response?.data?.message ||
-        'Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.';
+        "Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại kết nối mạng.";
 
       Alert.alert(
-        'Đăng ký thất bại',
-        Array.isArray(errorMessage) ? errorMessage.join('\n') : errorMessage,
+        "Đăng ký thất bại",
+        Array.isArray(errorMessage) ? errorMessage.join("\n") : errorMessage,
       );
     } finally {
       setLoading(false);
@@ -87,7 +91,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
     <UniverseBackground>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
           contentContainerStyle={styles.scroll}
@@ -107,8 +111,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                 placeholder="Nhập họ và tên"
                 placeholderTextColor="#6b7280"
                 autoCapitalize="none"
-                value={username} 
-                onChangeText={setUsername} 
+                value={username}
+                onChangeText={setUsername}
               />
             </View>
 
@@ -121,8 +125,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                 placeholderTextColor="#6b7280"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                value={email} 
-                onChangeText={setEmail} 
+                value={email}
+                onChangeText={setEmail}
               />
             </View>
 
@@ -134,8 +138,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                 placeholder="Nhập mật khẩu"
                 placeholderTextColor="#6b7280"
                 secureTextEntry
-                value={password} 
-                onChangeText={setPassword} 
+                value={password}
+                onChangeText={setPassword}
               />
             </View>
 
@@ -147,8 +151,8 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
                 placeholder="Nhập lại mật khẩu"
                 placeholderTextColor="#6b7280"
                 secureTextEntry
-                value={confirmPassword} 
-                onChangeText={setConfirmPassword} 
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
               />
             </View>
 
@@ -169,7 +173,7 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             {/* Link đăng nhập */}
             <View style={styles.loginRow}>
               <Text style={styles.loginText}>Đã có tài khoản? </Text>
-              <TouchableOpacity onPress={() => navigation?.navigate?.('Login')}>
+              <TouchableOpacity onPress={() => navigation?.navigate?.("Login")}>
                 <Text style={styles.loginLink}>Đăng nhập</Text>
               </TouchableOpacity>
             </View>

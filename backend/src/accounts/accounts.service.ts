@@ -19,10 +19,12 @@ export class AccountService {
 
   // 1. Tạo tài khoản chung trực tiếp vào MongoDB
   async createAccount(accountDto: AccountDto): Promise<any> {
-    const { username, email, password } = accountDto;
+    const username = accountDto.username.trim();
+    const email = accountDto.email.trim().toLowerCase();
+    const { password } = accountDto;
 
     const existingAccount = await this.accountModel.findOne({
-      or: [{ email }, { username }],
+      $or: [{ email }, { username }],
     });
     if (existingAccount) {
       throw new ConflictException('Email hoặc Tên người dùng đã tồn tại');
@@ -42,11 +44,7 @@ export class AccountService {
 
   // 2. Xem tất cả tài khoản
   async findAll(): Promise<any[]> {
-    return this.accountModel
-      .find()
-      .select('-password')
-      .lean()
-      .exec();
+    return this.accountModel.find().select('-password').lean().exec();
   }
 
   // 3. Xem chi tiết tài khoản bằng ID
@@ -58,10 +56,16 @@ export class AccountService {
     return account;
   }
 
+  async findByEmail(email: string): Promise<AccountDocument | null> {
+    return this.accountModel
+      .findOne({ email: email.trim().toLowerCase() })
+      .exec();
+  }
+
   // 3. Cập nhật tài khoản trên Cloud
   async updateAccount(id: string, accountDto: AccountDto): Promise<any | null> {
     const updateData: any = { ...accountDto };
-    
+
     if (updateData.password) {
       const salt = await bcrypt.genSalt();
       updateData.password = await bcrypt.hash(updateData.password, salt);
@@ -88,11 +92,13 @@ export class AccountService {
 
   // 5. Hàm ĐĂNG KÝ chính thức lưu vào Database Cloud Explor_Astronomy
   async register(registerDto: AccountDto) {
-    const { username, email, password } = registerDto;
+    const username = registerDto.username.trim();
+    const { password } = registerDto;
+    const email = registerDto.email.trim().toLowerCase();
 
     // Kiểm tra trùng lặp trên MongoDB Cloud thực tế
     const existingAccount = await this.accountModel.findOne({
-      or: [{ email }, { username }],
+      $or: [{ email }, { username }],
     });
 
     if (existingAccount) {

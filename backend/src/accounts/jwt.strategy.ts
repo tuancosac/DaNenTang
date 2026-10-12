@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // Lấy token từ thuộc tính Authorization: Bearer <TOKEN> trong Header
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false, // Từ chối nếu token hết hạn
-      secretOrKey: configService.get<string>('JWT_SECRET') || 'fallbackSecretKey123',
+      secretOrKey: configService.get<string>('JWT_SECRET') || 'SECRET_KEY',
     });
   }
 
